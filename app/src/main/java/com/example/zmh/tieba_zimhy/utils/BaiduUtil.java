@@ -38,7 +38,7 @@ public class BaiduUtil {
     private Toast toast = null ;
     private Context context  = null  ;
 
-    private String retuurnMassage ;
+    private String returnMassage;
     private HttpUtil httpUtil;
 
 
@@ -163,7 +163,7 @@ public class BaiduUtil {
       /*  toast = Toast.makeText(context, s,
                 Toast.LENGTH_SHORT);*/
         Log.i("info",s) ;
-        retuurnMassage = s ;
+        returnMassage = s ;
 
     }
 

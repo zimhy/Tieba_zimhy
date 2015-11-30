@@ -1,6 +1,7 @@
 package com.example.zmh.tieba_zimhy;
 import android.app.Activity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -11,9 +12,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.zmh.tieba_zimhy.utils.BaiduUtil;
 
 
 public class LoginActivity extends Activity {
+    public Integer LOGIN_SUCCESS = 1 ;
+
 
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -22,6 +28,7 @@ public class LoginActivity extends Activity {
     private Button mPlusSignInButton;
     private View mSignOutButtons;
     private View mLoginFormView;
+    private BaiduUtil baiduUtil  ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +46,7 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                  //  attemptLogin();
+                    attemptLogin();
                     return true;
                 }
                 return false;
@@ -50,7 +57,7 @@ public class LoginActivity extends Activity {
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // attemptLogin();
+                attemptLogin();
             }
         });
 
@@ -58,6 +65,7 @@ public class LoginActivity extends Activity {
         mProgressView = findViewById(R.id.login_progress);
         mEmailLoginFormView = findViewById(R.id.email_login_form);
         mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
+        baiduUtil = new BaiduUtil(getApplicationContext());
 
     }
 
@@ -82,4 +90,42 @@ public class LoginActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-}
+    public boolean  attemptLogin(){
+        new LoginTask().execute();
+
+        return false ;
+    }
+
+
+    private class LoginTask extends AsyncTask<Integer, Integer, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... params) {
+
+            //����һ��Httpclient����
+            String userName = mEmailView.getText().toString();
+            String passWord = mPasswordView.getText().toString();
+            baiduUtil.login(userName, passWord);
+            boolean isLogined = baiduUtil.login(userName, passWord);
+            if (isLogined) {
+                //TODO
+                baiduUtil.updateLikeBars() ;
+
+                return  LOGIN_SUCCESS;
+            }
+
+            return null ;
+        }
+        @Override
+        protected void onPostExecute(Integer result ) {
+            if (LOGIN_SUCCESS.equals(result))
+            Toast.makeText(getApplicationContext(), baiduUtil.getmLikeBars().toString(),
+                    Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext(),"登录失败",
+                        Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+
+    }
