@@ -1,6 +1,8 @@
-package com.example.zmh.tieba_zimhy;
+package activities;
 import android.app.Activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -14,11 +16,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.zmh.tieba_zimhy.R;
 import com.example.zmh.tieba_zimhy.utils.BaiduUtil;
 
 
-public class LoginActivity extends Activity {
-    public Integer LOGIN_SUCCESS = 1 ;
+public class LoginActivity extends BaseActivity {
+
 
 
     private AutoCompleteTextView mEmailView;
@@ -65,7 +68,7 @@ public class LoginActivity extends Activity {
         mProgressView = findViewById(R.id.login_progress);
         mEmailLoginFormView = findViewById(R.id.email_login_form);
         mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
-        baiduUtil = new BaiduUtil(getApplicationContext());
+        baiduUtil = BaiduUtil.getInstance();
 
     }
 
@@ -96,12 +99,25 @@ public class LoginActivity extends Activity {
         return false ;
     }
 
+    public void login_success()
+    {
+        final Uri uri = Uri.parse("http://tieba.baidu.com/mo");
+        Intent intent = new Intent(/*Intent.ACTION_VIEW,uri*/);
+
+
+
+        intent.setAction("android.intent.action.Home") ;
+        intent.addCategory(Intent.CATEGORY_DEFAULT) ;
+        startActivity(intent);
+
+    }
+
 
     private class LoginTask extends AsyncTask<Integer, Integer, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
 
-            //����һ��Httpclient����
+
             String userName = mEmailView.getText().toString();
             String passWord = mPasswordView.getText().toString();
             baiduUtil.login(userName, passWord);
@@ -117,9 +133,13 @@ public class LoginActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Integer result ) {
-            if (LOGIN_SUCCESS.equals(result))
-            Toast.makeText(getApplicationContext(), baiduUtil.getmLikeBars().toString(),
-                    Toast.LENGTH_SHORT).show();
+            if (LOGIN_SUCCESS.equals(result)) {
+                Toast.makeText(getApplicationContext(), baiduUtil.getLikeBars().size() + "",
+                        Toast.LENGTH_SHORT).show();
+                login_success();
+
+            }
+
             else
                 Toast.makeText(getApplicationContext(),"登录失败",
                         Toast.LENGTH_SHORT).show();
