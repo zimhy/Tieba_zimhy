@@ -11,7 +11,7 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.example.zmh.tieba_zimhy.R;
-import com.example.zmh.tieba_zimhy.entities.LikeBar;
+import entities.LikeBar;
 import com.example.zmh.tieba_zimhy.utils.BaiduUtil;
 
 import java.util.List;

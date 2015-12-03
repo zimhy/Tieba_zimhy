@@ -8,8 +8,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.zmh.tieba_zimhy.entities.LikeBar;
-import com.example.zmh.tieba_zimhy.entities.PostThread;
+import entities.LikeBar;
+import entities.PostThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -250,4 +250,17 @@ public class BaiduUtil {
     }
 
 
+    public boolean loadThreadPost(PostThread selected_thread, Integer pageNum) {
+        if("".equals(selected_thread.getUrl()) ||null == selected_thread.getUrl() )
+        {
+            return  false ;
+        }
+        String fetchUrl   = selected_thread.getUrl();
+        if(pageNum>1)
+        {
+            fetchUrl +=("&pn="+selected_thread.getPageCapacity()*(pageNum -1)) ;
+        }
+
+        return  false ;
+    }
 }

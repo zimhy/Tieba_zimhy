@@ -1,4 +1,4 @@
-package com.example.zmh.tieba_zimhy.entities;
+package entities;
 
 /**
  * Created by zmh on 2015/12/1.

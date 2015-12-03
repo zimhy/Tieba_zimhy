@@ -1,4 +1,4 @@
-package com.example.zmh.tieba_zimhy.entities;
+package entities;
 
 import java.util.List;
 
