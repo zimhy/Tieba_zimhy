@@ -34,7 +34,6 @@ public class HomeActivity extends BaseActivity {
         scrollView = (ScrollView) findViewById(R.id.scrollView_home);
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
-
         // ll.set
         List<LikeBar> likeBars = baiduUtil.getLikeBars();
         LikeBarListener listener = new LikeBarListener();

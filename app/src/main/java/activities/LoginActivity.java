@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.zmh.tieba_zimhy.R;
 import com.example.zmh.tieba_zimhy.utils.BaiduUtil;
+import com.example.zmh.tieba_zimhy.utils.TextSizeUtil;
 
 
 public class LoginActivity extends BaseActivity {
@@ -36,6 +37,8 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TextSizeUtil textSizeUtil  = TextSizeUtil.getInstance() ;
+        textSizeUtil.calSize(getWindowManager().getDefaultDisplay().getWidth());
         setContentView(R.layout.activity_login);
         mPlusSignInButton = (Button) findViewById(R.id.plus_sign_in_button);
 

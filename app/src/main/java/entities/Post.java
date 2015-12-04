@@ -5,8 +5,10 @@ package entities;
  */
 public class Post {
     BaiduUser user ;
+    String replyCount ;
     String url ;
     String context ;
+    String time ;
 
     public String getContext() {
         return context;
@@ -30,5 +32,21 @@ public class Post {
 
     public void setUser(BaiduUser user) {
         this.user = user;
+    }
+
+    public String getReplyCount() {
+        return replyCount;
+    }
+
+    public void setReplyCount(String replyCount) {
+        this.replyCount = replyCount;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

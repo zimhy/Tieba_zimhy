@@ -8,7 +8,9 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import entities.BaiduUser;
 import entities.LikeBar;
+import entities.Post;
 import entities.PostThread;
 
 import java.util.ArrayList;
@@ -32,16 +34,16 @@ public class BaiduUtil {
     private static final BaiduUtil baiduUtil = new BaiduUtil();
 
 
-    private static  final  String mLoginUrl = "http://wappass.baidu.com/passport/login";
+    private static final String mLoginUrl = "http://wappass.baidu.com/passport/login";
 
-    private static  final   String mIndexUrl = "http://tieba.baidu.com/mo";
+    private static final String mIndexUrl = "http://tieba.baidu.com/mo";
 
-    private  static  final  String mUrlHead = "http://tieba.baidu.com";
+    private static final String mUrlHead = "http://tieba.baidu.com";
 
     private boolean isAuth = false;
     private Toast toast = null;
     private Context context = null;
-
+    private String barBaseUrl = null;
     private String returnMassage;
     private HttpUtil httpUtil;
 
@@ -177,35 +179,31 @@ public class BaiduUtil {
             return false;
         }
         String barIndexUrl = likeBar.getUrl();
-        String barBaseUrl = barIndexUrl.substring(0, barIndexUrl.lastIndexOf('/'));
+        barBaseUrl = barIndexUrl.substring(0, barIndexUrl.lastIndexOf('/'));
         if (pageNum > 1) {
             barIndexUrl += "&pn=" + (pageNum - 1) * 20;
         }
         String s_Page = getWebContent(likeBar.getUrl());
         Document d_Page = Jsoup.parse(s_Page);
-        Element totalPage = d_Page.select("[name=pnum]").first() ;
+        Element totalPage = d_Page.select("[name=pnum]").first();
         likeBar.setTotalPage(Integer.parseInt(totalPage.attr("value")));
-        Element skipPage = d_Page.select("div[class=bc p]").first() ;
-        String  prePageUrl = null ;
-        String nextPageUrl = null ;
+        Element skipPage = d_Page.select("div[class=bc p]").first();
+        String prePageUrl = null;
+        String nextPageUrl = null;
 
         if (skipPage.getElementsByAttribute("accesskey").size() == 2) {
             prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
             nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(1).attr("href");
-        }else
-        {
-            if(pageNum == 1 )
-            {
+        } else {
+            if (pageNum == 1) {
                 nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
-            }else
-            {
+            } else {
                 prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
             }
         }
-        likeBar.setPrePageUrl(barBaseUrl+prePageUrl);
-        likeBar.setNextPageUrl(barBaseUrl+nextPageUrl);
+        likeBar.setPrePageUrl(barBaseUrl + prePageUrl);
+        likeBar.setNextPageUrl(barBaseUrl + nextPageUrl);
         likeBar.setCurrentPage(pageNum);
-
 
 
         Elements e_PostThreads = d_Page.getElementsByClass("i");
@@ -251,16 +249,77 @@ public class BaiduUtil {
 
 
     public boolean loadThreadPost(PostThread selected_thread, Integer pageNum) {
-        if("".equals(selected_thread.getUrl()) ||null == selected_thread.getUrl() )
-        {
-            return  false ;
+        if ("".equals(selected_thread.getUrl()) || null == selected_thread.getUrl()) {
+            return false;
         }
-        String fetchUrl   = selected_thread.getUrl();
-        if(pageNum>1)
-        {
-            fetchUrl +=("&pn="+selected_thread.getPageCapacity()*(pageNum -1)) ;
+        String fetchUrl = selected_thread.getUrl();
+        if (pageNum > 1) {
+            fetchUrl += ("&pn=" + (selected_thread.getPageCapacity() * (pageNum - 1)));
+        }
+        String s_Page = getWebContent(fetchUrl);
+        Document d_Page = Jsoup.parse(s_Page);
+        Element skipPage = d_Page.select("div[class=h]").last();
+
+        Element totalPage = d_Page.select("[name=pnum]").first();
+        if (totalPage == null) {
+            selected_thread.setTotalPage(1);
+        } else {
+            selected_thread.setTotalPage(Integer.parseInt(totalPage.attr("value")));
         }
 
-        return  false ;
+        String prePageUrl = null;
+        String nextPageUrl = null;
+
+        if (skipPage != null) {
+            if (skipPage.getElementsByAttribute("accesskey").size() == 2) {
+                prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
+                nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(1).attr("href");
+            } else {
+                if (pageNum == 1) {
+                    nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
+                } else {
+                    prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
+                }
+            }
+        }
+
+        Elements e_posts = d_Page.getElementsByClass("i");
+        if (selected_thread.getPosts() == null) {
+            selected_thread.setPosts(new ArrayList<Post>());
+        }
+        List<Post> posts = selected_thread.getPosts();
+        for (Element e_post : e_posts) {
+            Post post = new Post();
+            post.setUrl(barBaseUrl + "/" + e_post.getElementsByClass("reply_to").attr("href"));
+            post.setReplyCount(e_post.getElementsByClass("reply_to").text());
+
+
+            Element e_time = e_post.select("span[class=g]").first();
+            post.setTime(e_time.text());
+
+            Element e_user_name = e_post.select("span[class=g]").first();
+            BaiduUser user = new BaiduUser();
+
+            user.setName(e_user_name.getElementsByTag("a").first().text());
+            post.setUser(user);
+            e_post.removeClass("g");
+            e_post.removeClass("b");
+            e_post.removeClass("reply_to");
+            String allText = e_post.text();
+
+            post.setContext(allText.substring
+                    (0, allText.length() - post.getReplyCount().length()
+                            - post.getTime().length() - user.getName().length()));
+
+
+            //  Element e_user_url = e_post.select("span[class=b]").first() ;
+            // user.setUrl(barBaseUrl + e_user_url.getElementsByTag("a").attr("href"));
+
+
+            posts.add(post);
+        }
+        return true;
+
+
     }
 }

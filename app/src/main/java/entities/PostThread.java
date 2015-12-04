@@ -6,12 +6,14 @@ import java.util.List;
  * Created by zmh on 2015/12/1.
  */
 public class PostThread {
-    String url ;
-    String title ;
-    String viewMessage ;
-    Integer pageCapacity  = 30;
+    private String url ;
+    private String title ;
+    private String viewMessage ;
+    private Integer pageCapacity  = 30;
     private Integer totalPage = 0 ;
     private Integer currentPage = 0 ;
+    private String nextPageUrl ;
+    private  String prePageUrl ;
 
     List<Post> Posts ;
 
@@ -69,5 +71,21 @@ public class PostThread {
 
     public void setTotalPage(Integer totalPage) {
         this.totalPage = totalPage;
+    }
+
+    public String getNextPageUrl() {
+        return nextPageUrl;
+    }
+
+    public void setNextPageUrl(String nextPageUrl) {
+        this.nextPageUrl = nextPageUrl;
+    }
+
+    public String getPrePageUrl() {
+        return prePageUrl;
+    }
+
+    public void setPrePageUrl(String prePageUrl) {
+        this.prePageUrl = prePageUrl;
     }
 }

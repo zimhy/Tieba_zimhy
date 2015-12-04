@@ -5,14 +5,14 @@ package entities;
  */
 public class BaiduUser {
     String name ;
-    String level  ;
+    String url;
 
-    public String getLevel() {
-        return level;
+    public String getUrl() {
+        return url;
     }
 
-    public void setLevel(String level) {
-        this.level = level;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getName() {

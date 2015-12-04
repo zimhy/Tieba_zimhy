@@ -23,29 +23,32 @@ import java.util.List;
  * Created by zmh on 2015/12/2.
  */
 public class BarActivity extends BaseActivity {
+
     private Button b_prePage;
     private Button b_refresh;
     private Button b_nextPage;
     private ScrollView contextContainer;
     private BaiduUtil baiduUtil;
     private LikeBar bar;
-    private Integer index_selected_thread  =  0 ;
-    private PostThread selected_thread ;
+    private Integer index_selected_thread = 0;
+    private Integer index_selected_bar = 0;
+    private PostThread selected_thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bar);
-        b_prePage = (Button) findViewById(R.id.prePage);
+        b_prePage = (Button) findViewById(R.id.prePage_thread);
         b_refresh = (Button) findViewById(R.id.refresh);
-        b_nextPage = (Button) findViewById(R.id.nextPage);
+        b_nextPage = (Button) findViewById(R.id.nextPage_thread);
         contextContainer = (ScrollView) findViewById(R.id.contentScroll);
         baiduUtil = BaiduUtil.getInstance();
         Intent intent = getIntent();
-        bar = baiduUtil.getLikeBars().get(intent.getIntExtra(LIKE_BAR_INDEX, 0));
+        index_selected_bar = intent.getIntExtra(LIKE_BAR_INDEX, 0);
+        bar = baiduUtil.getLikeBars().get(index_selected_bar);
         PThreadListener listener = new PThreadListener();
         if (bar.getPostThreads() == null) {
-            Toast.makeText(this, "·¢Éú´íÎó£¬ÇëÖØÊÔ", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "å‘ç”Ÿé”™è¯¯ï¼Œè¯·é‡è¯•", Toast.LENGTH_SHORT);
             return;
         }
         //TODO
@@ -56,9 +59,9 @@ public class BarActivity extends BaseActivity {
         for (int i = 0; i < threads.size(); i++) {
             PostThread postThread = threads.get(i);
             PostThreadView PTView = new PostThreadView(getApplicationContext(), postThread);
-             LinearLayout.LayoutParams linearParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT/2,40);
+            LinearLayout.LayoutParams linearParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT / 2, 40);
             linearParam.width = LinearLayout.LayoutParams.MATCH_PARENT;
-            linearParam.height = 100 ;
+            linearParam.height = 100;
             PTView.setLayoutParams(linearParam);
             PTView.setTag(i);
             ll.addView(PTView);
@@ -77,11 +80,11 @@ public class BarActivity extends BaseActivity {
     private class PThreadListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            index_selected_thread = (Integer) v.getTag() ;
+            index_selected_thread = (Integer) v.getTag();
             selected_thread = bar.getPostThreads().get(index_selected_thread);
 
             new LoadTask().execute();
-            Toast.makeText(getApplicationContext(), "¼ÓÔØÖĞ",
+            Toast.makeText(getApplicationContext(), "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -89,14 +92,28 @@ public class BarActivity extends BaseActivity {
     private class LoadTask extends AsyncTask<Integer, Integer, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
-            // TODO
-            baiduUtil.loadThreadPost(selected_thread, 1) ;
-            return  null ;
+
+            if (selected_thread != null && baiduUtil.loadThreadPost(selected_thread, 1))
+                return 1;
+            else
+                return null;
+
         }
 
         @Override
         protected void onPostExecute(Integer result) {
-            //TODO
+            if(null==result)
+            {
+                Toast.makeText(getApplicationContext(),"ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",Toast.LENGTH_SHORT);
+            }else
+            {
+                Intent intent = new Intent() ;
+                intent.putExtra(LIKE_BAR_INDEX,index_selected_bar) ;
+                intent.putExtra(SELECTED_THREAD_INDEX,index_selected_thread) ;
+                intent.setAction("android.intent.action.PostThread") ;
+                intent.addCategory(Intent.CATEGORY_DEFAULT) ;
+                startActivity(intent);
+            }
         }
     }
 }
