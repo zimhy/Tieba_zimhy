@@ -7,8 +7,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,36 +37,44 @@ public class PostView extends BaseView {
     public PostView(Context context, Post post) {
         super(context);
         this.post = post;
+        TextView blank = new TextView(context);
+        blank.setHeight(20);
+        this.addView(blank);
+
         TextSizeUtil sizeUtil = TextSizeUtil.getInstance() ;
         TextView content = new TextView(context);
-        content.setTextSize(sizeUtil.getMidTextSize());
+
+        content.setTextSize(TypedValue.COMPLEX_UNIT_PX,sizeUtil.getBigTextSize());
         content.setText(post.getContext());
         content.setEllipsize(TextUtils.TruncateAt.END);
+        content.setTextColor(Color.BLACK);
         //content.setId((int)1);
-        LayoutParams params_content  = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT) ;
-        params_content.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        params_content.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        addView(content,params_content);
+        LayoutParams params_content  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;
+     /*   params_content.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_content.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);*/
+
+        addView(content, params_content);
+
+        TextView blank2 = new TextView(context);
+        blank.setHeight(15);
+        addView(blank2);
 
 
-
-        LinearLayout userName_time_reply = new LinearLayout(context);
+        RelativeLayout userName_time_reply = new RelativeLayout(context);
         /*userName_time_reply.setOrientation(HORIZONTAL);*/
+        RelativeLayout.LayoutParams params_left = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT) ;
+        params_left.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         TextView userName_time = new TextView(context);
-        userName_time.setGravity(Gravity.LEFT);
+        userName_time.setTextColor(Color.BLACK);
         userName_time.setText(post.getUser().getName() + "   " + post.getTime());
+        userName_time_reply.addView(userName_time, params_left);
+        RelativeLayout.LayoutParams params_right = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT) ;
+        params_right.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         TextView reply = new TextView(context);
-        reply.setGravity(Gravity.RIGHT);
         reply.setText(post.getReplyCount());
-        userName_time_reply.addView(userName_time);
-        userName_time_reply.addView(reply);
-        //userName_time_replys.setTextSize(sizeUtil.getSmallTextSize() + 3);
-        LayoutParams params_userNames  = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT) ;
-        params_userNames.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params_userNames.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-      //  params_userNames.addRule(RelativeLayout.A,content.getId());
 
-        addView(userName_time_reply,params_userNames);
+        userName_time_reply.addView(reply,params_right);
+        addView(userName_time_reply);
 
     }
   /*  public PostThreadView( PostThread pThread) {

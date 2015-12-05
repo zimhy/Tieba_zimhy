@@ -3,6 +3,7 @@ package activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -33,6 +34,9 @@ public class BarActivity extends BaseActivity {
     private Integer index_selected_thread = 0;
     private Integer index_selected_bar = 0;
     private PostThread selected_thread;
+    PThreadListener threadListener;
+    PThreadButtonListener buttonListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,37 +45,16 @@ public class BarActivity extends BaseActivity {
         b_prePage = (Button) findViewById(R.id.prePage_thread);
         b_refresh = (Button) findViewById(R.id.refresh);
         b_nextPage = (Button) findViewById(R.id.nextPage_thread);
+        buttonListener = new PThreadButtonListener();
+        b_prePage.setOnClickListener(buttonListener);
+        b_nextPage.setOnClickListener(buttonListener);
         contextContainer = (ScrollView) findViewById(R.id.contentScroll);
         baiduUtil = BaiduUtil.getInstance();
         Intent intent = getIntent();
         index_selected_bar = intent.getIntExtra(LIKE_BAR_INDEX, 0);
         bar = baiduUtil.getLikeBars().get(index_selected_bar);
-        PThreadListener listener = new PThreadListener();
-        if (bar.getPostThreads() == null) {
-            Toast.makeText(this, "发生错误，请重试", Toast.LENGTH_SHORT);
-            return;
-        }
-        //TODO
-        Integer index_Bar = intent.getIntExtra(LIKE_BAR_INDEX, 0);
-        LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        List<PostThread> threads = bar.getPostThreads();
-        for (int i = 0; i < threads.size(); i++) {
-            PostThread postThread = threads.get(i);
-            PostThreadView PTView = new PostThreadView(getApplicationContext(), postThread);
-            LinearLayout.LayoutParams linearParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT / 2, 40);
-            linearParam.width = LinearLayout.LayoutParams.MATCH_PARENT;
-            linearParam.height = 100;
-            PTView.setLayoutParams(linearParam);
-            PTView.setTag(i);
-            ll.addView(PTView);
-            PTView.setOnClickListener(listener);
-          /*  Button thread = new Button(this) ;
-            thread.setText(postThread.getTitle());
-            ll.addView(thread);*/
-
-        }
-        contextContainer.addView(ll);
+        threadListener = new PThreadListener();
+        displayThreads(bar);
 
 
     }
@@ -83,15 +66,73 @@ public class BarActivity extends BaseActivity {
             index_selected_thread = (Integer) v.getTag();
             selected_thread = bar.getPostThreads().get(index_selected_thread);
 
-            new LoadTask().execute();
-            Toast.makeText(getApplicationContext(), "������",
+            new LoadPostsTask().execute();
+            Toast.makeText(getApplicationContext(), "加载中",
                     Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class LoadTask extends AsyncTask<Integer, Integer, Integer> {
+
+    private class PThreadButtonListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+            int currentPage = bar.getCurrentPage();
+            int totalPage = bar.getTotalPage();
+            if (v.getId() == R.id.prePage_thread) {
+                if (currentPage == 1) {
+                    Toast.makeText(getApplicationContext(), "已经是第一页", Toast.LENGTH_SHORT);
+                } else {
+                    new LoadThreadTask().execute(currentPage - 1);
+                    Toast.makeText(getApplicationContext(), "加载中",
+                            Toast.LENGTH_SHORT).show();
+                }
+            } else if (v.getId() == R.id.nextPage_thread) {
+                if (currentPage == totalPage) {
+                    Toast.makeText(getApplicationContext(), "已经是最后一页", Toast.LENGTH_SHORT);
+                } else {
+                    new LoadThreadTask().execute(currentPage + 1);
+                    Toast.makeText(getApplicationContext(), "加载中",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+
+        }
+    }
+
+    private class LoadThreadTask extends AsyncTask<Integer, Integer, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
+            Integer pageNum = params[0];
+
+            if (bar != null && baiduUtil.loadBarContent(bar, pageNum))
+                return 1;
+            else
+                return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+
+
+            if (null == result) {
+                Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
+            } else {
+                contextContainer.removeAllViews();
+                displayThreads(bar);
+                contextContainer.invalidate();
+
+            }
+        }
+    }
+
+
+    private class LoadPostsTask extends AsyncTask<Integer, Integer, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... params) {
+
 
             if (selected_thread != null && baiduUtil.loadThreadPost(selected_thread, 1))
                 return 1;
@@ -102,18 +143,48 @@ public class BarActivity extends BaseActivity {
 
         @Override
         protected void onPostExecute(Integer result) {
-            if(null==result)
-            {
-                Toast.makeText(getApplicationContext(),"����ʧ�ܣ�������",Toast.LENGTH_SHORT);
-            }else
-            {
-                Intent intent = new Intent() ;
-                intent.putExtra(LIKE_BAR_INDEX,index_selected_bar) ;
-                intent.putExtra(SELECTED_THREAD_INDEX,index_selected_thread) ;
-                intent.setAction("android.intent.action.PostThread") ;
-                intent.addCategory(Intent.CATEGORY_DEFAULT) ;
+
+
+            if (null == result) {
+                Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
+                Log.e("html",baiduUtil.getReturnMassage()) ;
+            } else {
+
+                Intent intent = new Intent();
+                intent.putExtra(LIKE_BAR_INDEX, index_selected_bar);
+                intent.putExtra(SELECTED_THREAD_INDEX, index_selected_thread);
+                intent.setAction("android.intent.action.PostThread");
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
                 startActivity(intent);
+
             }
         }
+    }
+
+
+    private void displayThreads(LikeBar bar) {
+
+        if (bar == null || bar.getPostThreads() == null) {
+            Toast.makeText(this, "发生错误，请重试", Toast.LENGTH_SHORT);
+            return;
+        }
+        //TODO
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        List<PostThread> threads = bar.getPostThreads();
+        for (int i = 0; i < threads.size(); i++) {
+            PostThread postThread = threads.get(i);
+            if (postThread.validCheck()) {
+                PostThreadView PTView = new PostThreadView(getApplicationContext(), postThread);
+                LinearLayout.LayoutParams linearParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT / 2, 40);
+                linearParam.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                linearParam.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                PTView.setLayoutParams(linearParam);
+                PTView.setTag(i);
+                ll.addView(PTView);
+                PTView.setOnClickListener(threadListener);
+            }
+        }
+        contextContainer.addView(ll);
     }
 }

@@ -5,6 +5,7 @@ package com.example.zmh.tieba_zimhy.utils;
  */
 
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,8 +24,10 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
+//import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 /**
@@ -167,8 +170,7 @@ public class BaiduUtil {
     }
 
     public void print(String s) {
-      /*  toast = Toast.makeText(context, s,
-                Toast.LENGTH_SHORT);*/
+
         Log.i("info", s);
         returnMassage = s;
 
@@ -183,9 +185,11 @@ public class BaiduUtil {
         if (pageNum > 1) {
             barIndexUrl += "&pn=" + (pageNum - 1) * 20;
         }
-        String s_Page = getWebContent(likeBar.getUrl());
+        String s_Page = getWebContent(barIndexUrl);
+
         Document d_Page = Jsoup.parse(s_Page);
         Element totalPage = d_Page.select("[name=pnum]").first();
+
         likeBar.setTotalPage(Integer.parseInt(totalPage.attr("value")));
         Element skipPage = d_Page.select("div[class=bc p]").first();
         String prePageUrl = null;
@@ -209,6 +213,8 @@ public class BaiduUtil {
         Elements e_PostThreads = d_Page.getElementsByClass("i");
         if (likeBar.getPostThreads() == null) {
             likeBar.setPostThreads(new ArrayList<PostThread>());
+        } else {
+            likeBar.getPostThreads().clear();
         }
 
         for (Element e_PostThread : e_PostThreads) {
@@ -258,68 +264,75 @@ public class BaiduUtil {
         }
         String s_Page = getWebContent(fetchUrl);
         Document d_Page = Jsoup.parse(s_Page);
-        Element skipPage = d_Page.select("div[class=h]").last();
 
-        Element totalPage = d_Page.select("[name=pnum]").first();
-        if (totalPage == null) {
-            selected_thread.setTotalPage(1);
-        } else {
-            selected_thread.setTotalPage(Integer.parseInt(totalPage.attr("value")));
-        }
+        try {
 
-        String prePageUrl = null;
-        String nextPageUrl = null;
 
-        if (skipPage != null) {
-            if (skipPage.getElementsByAttribute("accesskey").size() == 2) {
-                prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
-                nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(1).attr("href");
+            Element skipPage = d_Page.select("div[class=h]").last();
+
+            Element totalPage = d_Page.select("[name=pnum]").first();
+            if (totalPage == null) {
+                selected_thread.setTotalPage(1);
             } else {
-                if (pageNum == 1) {
-                    nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
-                } else {
+                selected_thread.setTotalPage(Integer.parseInt(totalPage.attr("value")));
+            }
+
+            String prePageUrl = null;
+            String nextPageUrl = null;
+
+            if (skipPage != null) {
+                if (skipPage.getElementsByAttribute("accesskey").size() == 2) {
                     prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
+                    nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(1).attr("href");
+                } else {
+                    if (pageNum == 1) {
+                        nextPageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
+                    } else {
+                        prePageUrl = skipPage.getElementsByAttribute("accesskey").get(0).attr("href");
+                    }
                 }
             }
+
+            Elements e_posts = d_Page.getElementsByClass("i");
+            if (selected_thread.getPosts() == null) {
+                selected_thread.setPosts(new ArrayList<Post>());
+            } else {
+                selected_thread.getPosts().clear();
+            }
+            List<Post> posts = selected_thread.getPosts();
+            for (Element e_post : e_posts) {
+                Post post = new Post();
+                post.setUrl(barBaseUrl + "/" + e_post.getElementsByClass("reply_to").attr("href"));
+                post.setReplyCount(e_post.getElementsByClass("reply_to").text());
+
+
+                Element e_time = e_post.select("span[class=b]").first();
+                post.setTime(e_time.text());
+
+                Element e_user_name = e_post.select("span[class=g]").first();
+                BaiduUser user = new BaiduUser();
+
+                user.setName(e_user_name.getElementsByTag("a").first().text());
+                post.setUser(user);
+                Elements e_images = e_post.getElementsByTag("a") ;
+                for(Element e_image:e_images)
+                {
+
+                }
+                String s_post = e_post.html().replaceAll("(?i)<br[^>]*>", "br2n");
+                String text = Jsoup.parse(s_post).text();
+                text = text.replaceAll("br2n", "\n");
+                post.setContext(text.substring(0, text.lastIndexOf('\n')));
+
+              //  post.setContext(e_post.html().replaceAll(""));
+                posts.add(post);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnMassage = "出错的HTML：" + s_Page;
+            return false;
         }
-
-        Elements e_posts = d_Page.getElementsByClass("i");
-        if (selected_thread.getPosts() == null) {
-            selected_thread.setPosts(new ArrayList<Post>());
-        }
-        List<Post> posts = selected_thread.getPosts();
-        for (Element e_post : e_posts) {
-            Post post = new Post();
-            post.setUrl(barBaseUrl + "/" + e_post.getElementsByClass("reply_to").attr("href"));
-            post.setReplyCount(e_post.getElementsByClass("reply_to").text());
-
-
-            Element e_time = e_post.select("span[class=g]").first();
-            post.setTime(e_time.text());
-
-            Element e_user_name = e_post.select("span[class=g]").first();
-            BaiduUser user = new BaiduUser();
-
-            user.setName(e_user_name.getElementsByTag("a").first().text());
-            post.setUser(user);
-            e_post.removeClass("g");
-            e_post.removeClass("b");
-            e_post.removeClass("reply_to");
-            String allText = e_post.text();
-
-            post.setContext(allText.substring
-                    (0, allText.length() - post.getReplyCount().length()
-                            - post.getTime().length() - user.getName().length()));
-
-
-            //  Element e_user_url = e_post.select("span[class=b]").first() ;
-            // user.setUrl(barBaseUrl + e_user_url.getElementsByTag("a").attr("href"));
-
-
-            posts.add(post);
-        }
-        return true;
-
 
     }
 }

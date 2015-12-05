@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ public class PostThreadView extends BaseView {
 
     public PostThreadView(Context context, PostThread pThread) {
         super(context);
+       // setBackgroundColor(Color.BLACK);
         TextSizeUtil sizeUtil = TextSizeUtil.getInstance() ;
         this.postThread = pThread;
         TextView blank = new TextView(context);
@@ -46,25 +48,23 @@ public class PostThreadView extends BaseView {
         TextView title = new TextView(context);
 
         title.setText(pThread.getTitle());
-        title.setTextSize(sizeUtil.getMidTextSize());
-        title.setEllipsize(TextUtils.TruncateAt.END);
-        LayoutParams params_title  = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT) ;
-        params_title.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        params_title.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_PX,sizeUtil.getBigTextSize());
+        //title.setBackgroundColor(Color.RED);
+
+        LayoutParams params_title  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;
+
         this.addView(title, params_title);
 
         TextView messages = new TextView(context);
-       // messages.text
-
         messages.setText(pThread.getViewMessage());
-        messages.setTextSize(sizeUtil.getSmallTextSize() + 3);
-        LayoutParams params_message  = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) ;
-        params_message.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params_message.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        params_message.addRule(RelativeLayout.ALIGN_PARENT_END);
+        messages.setTextSize(TypedValue.COMPLEX_UNIT_PX,sizeUtil.getSmallTextSize() + 3);
         messages.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
-        messages.setGravity(Gravity.LEFT);
-        this.addView(messages,params_message);
+        messages.setGravity(Gravity.RIGHT);
+       // LayoutParams params_message  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;
+
+
+       // messages.setGravity(Gravity.LEFT);
+        this.addView(messages,params_title);
 
     /*    params.
         params.bottomMargin

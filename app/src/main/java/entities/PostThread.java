@@ -6,16 +6,22 @@ import java.util.List;
  * Created by zmh on 2015/12/1.
  */
 public class PostThread {
-    private String url ;
-    private String title ;
-    private String viewMessage ;
-    private Integer pageCapacity  = 30;
-    private Integer totalPage = 0 ;
-    private Integer currentPage = 0 ;
-    private String nextPageUrl ;
-    private  String prePageUrl ;
+    private static String ERROR_VIEW_MESSAGE = "点 回 1970-1-1";
+    private String url;
+    private String title;
+    private String viewMessage;
+    private Integer pageCapacity = 30;
+    private Integer totalPage = 0;
+    private Integer currentPage = 0;
+    private String nextPageUrl;
+    private String prePageUrl;
 
-    List<Post> Posts ;
+    List<Post> Posts;
+
+
+    public boolean validCheck() {
+        return url != null && title != null && !ERROR_VIEW_MESSAGE.equals(viewMessage);
+    }
 
     public String getTitle() {
         return title;
