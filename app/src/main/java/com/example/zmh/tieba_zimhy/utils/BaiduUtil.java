@@ -334,4 +334,8 @@ public class BaiduUtil {
         }
 
     }
+
+    public boolean loadPostReplies(Post post) {
+        return false;
+    }
 }

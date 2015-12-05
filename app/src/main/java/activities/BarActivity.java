@@ -52,6 +52,7 @@ public class BarActivity extends BaseActivity {
         buttonListener = new PThreadButtonListener();
         b_prePage.setOnClickListener(buttonListener);
         b_nextPage.setOnClickListener(buttonListener);
+        b_refresh.setOnClickListener(buttonListener);
         contextContainer = (ScrollView) findViewById(R.id.contentScroll);
         baiduUtil = BaiduUtil.getInstance();
         Intent intent = getIntent();
@@ -80,27 +81,35 @@ public class BarActivity extends BaseActivity {
     private class PThreadButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-
             int currentPage = bar.getCurrentPage();
             int totalPage = bar.getTotalPage();
-            if (v.getId() == R.id.prePage_thread) {
-                if (currentPage == 1) {
-                    Toast.makeText(getApplicationContext(), "已经是第一页", Toast.LENGTH_SHORT);
-                } else {
-                    new LoadThreadTask().execute(currentPage - 1);
+            switch (v.getId()) {
+                case R.id.prePage_thread:
+                    if (currentPage == 1) {
+                        Toast.makeText(getApplicationContext(), "已经是第一页", Toast.LENGTH_SHORT);
+                    } else {
+                        new LoadThreadTask().execute(currentPage - 1);
+                        Toast.makeText(getApplicationContext(), "加载中",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case R.id.nextPage_thread:
+                    if (currentPage == totalPage) {
+                        Toast.makeText(getApplicationContext(), "已经是最后一页", Toast.LENGTH_SHORT);
+                    } else {
+                        new LoadThreadTask().execute(currentPage + 1);
+                        Toast.makeText(getApplicationContext(), "加载中",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case R.id.refresh:
+                    new LoadThreadTask().execute(currentPage);
                     Toast.makeText(getApplicationContext(), "加载中",
                             Toast.LENGTH_SHORT).show();
-                }
-            } else if (v.getId() == R.id.nextPage_thread) {
-                if (currentPage == totalPage) {
-                    Toast.makeText(getApplicationContext(), "已经是最后一页", Toast.LENGTH_SHORT);
-                } else {
-                    new LoadThreadTask().execute(currentPage + 1);
-                    Toast.makeText(getApplicationContext(), "加载中",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
+                    break;
 
+
+            }
 
         }
     }
@@ -126,6 +135,8 @@ public class BarActivity extends BaseActivity {
             } else {
                 contextContainer.removeAllViews();
                 displayThreads(bar);
+                Toast.makeText(getApplicationContext(),
+                        "当前第" + bar.getCurrentPage() + "页", Toast.LENGTH_SHORT).show();
                 contextContainer.invalidate();
 
             }
@@ -151,7 +162,7 @@ public class BarActivity extends BaseActivity {
 
             if (null == result) {
                 Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
-                Log.e("html",baiduUtil.getReturnMassage()) ;
+                Log.e("html", baiduUtil.getReturnMassage());
             } else {
 
                 Intent intent = new Intent();

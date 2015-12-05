@@ -35,11 +35,13 @@ public class PostThreadActivity extends BaseActivity {
     private ScrollView contextContainer;
     private BaiduUtil baiduUtil;
     private LikeBar bar;
+    private Integer index_selected_post = 0;
     private Integer index_selected_thread = 0;
     private Integer index_selected_bar = 0;
     private PostThread selected_thread;
     private PostListener postListener;
     private PostButtonListener buttonListener;
+    private Post selected_post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +141,40 @@ public class PostThreadActivity extends BaseActivity {
     class PostListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            //TODO
+            index_selected_post = (Integer) v.getTag();
+            selected_thread = bar.getPostThreads().get(index_selected_thread);
+            selected_post = selected_thread.getPosts().get(index_selected_post);
+
+
+            new LoadPostsTask().execute();
+            Toast.makeText(getApplicationContext(), "加载中",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class LoadRepliesTask extends AsyncTask<Integer, Integer, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... params) {
+            Integer pageNum = params[0]  ;
+            if (selected_post != null && baiduUtil.loadPostReplies(selected_post))
+                return 1;
+            else
+                return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+
+
+            if (null == result) {
+                Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
+                Log.e("html", baiduUtil.getReturnMassage());
+            } else {
+                contextContainer.removeAllViews();
+                displayPosts(selected_thread);
+                contextContainer.invalidate();
+            }
         }
     }
 
@@ -157,7 +192,6 @@ public class PostThreadActivity extends BaseActivity {
             linearParam.height = LinearLayout.LayoutParams.WRAP_CONTENT;
             PView.setLayoutParams(linearParam);
             PView.setTag(i);
-
             ll.addView(PView);
             PView.setOnClickListener(postListener);
 
