@@ -54,22 +54,22 @@ public class BaseView extends LinearLayout {
     }
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        // »ñÈ¡²¼¾Ö¿Ø¼þ¿í¸ß
+
         int width = getWidth();
         int height = getHeight();
-        // ´´½¨»­±Ê
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         Paint mPaint = new Paint();
         mPaint.setAlpha(120);
-        // ÉèÖÃ»­±ÊµÄ¸÷¸öÊôÐÔ
+
         mPaint.setColor(Color.GRAY);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(2);
         mPaint.setAntiAlias(true);
-        // ´´½¨¾ØÐÎ¿ò
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¿ï¿½
         Rect mRect = new Rect(0, 0, width, height);
-        // »æÖÆ±ß¿ò
+        // ï¿½ï¿½ï¿½Æ±ß¿ï¿½
         canvas.drawRect(mRect, mPaint);
-        // ×îºó±ØÐëµ÷ÓÃ¸¸ÀàµÄ·½·¨
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
         super.dispatchDraw(canvas);
     }
 }

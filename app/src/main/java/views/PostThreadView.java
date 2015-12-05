@@ -38,8 +38,8 @@ public class PostThreadView extends BaseView {
 
     public PostThreadView(Context context, PostThread pThread) {
         super(context);
-       // setBackgroundColor(Color.BLACK);
-        TextSizeUtil sizeUtil = TextSizeUtil.getInstance() ;
+        // setBackgroundColor(Color.BLACK);
+        TextSizeUtil sizeUtil = TextSizeUtil.getInstance();
         this.postThread = pThread;
         TextView blank = new TextView(context);
         blank.setHeight(10);
@@ -48,23 +48,24 @@ public class PostThreadView extends BaseView {
         TextView title = new TextView(context);
 
         title.setText(pThread.getTitle());
-        title.setTextSize(TypedValue.COMPLEX_UNIT_PX,sizeUtil.getBigTextSize());
+        title.setTextColor(Color.BLACK);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeUtil.getBigTextSize());
         //title.setBackgroundColor(Color.RED);
 
-        LayoutParams params_title  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;
+        LayoutParams params_title = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
         this.addView(title, params_title);
 
         TextView messages = new TextView(context);
         messages.setText(pThread.getViewMessage());
-        messages.setTextSize(TypedValue.COMPLEX_UNIT_PX,sizeUtil.getSmallTextSize() + 3);
+        messages.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeUtil.getSmallTextSize() + 3);
         messages.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
         messages.setGravity(Gravity.RIGHT);
-       // LayoutParams params_message  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;
+        // LayoutParams params_message  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;
 
 
-       // messages.setGravity(Gravity.LEFT);
-        this.addView(messages,params_title);
+        // messages.setGravity(Gravity.LEFT);
+        this.addView(messages, params_title);
 
     /*    params.
         params.bottomMargin

@@ -2,12 +2,16 @@ package activities;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.example.zmh.tieba_zimhy.R;
 import com.example.zmh.tieba_zimhy.utils.BaiduUtil;
@@ -41,10 +45,18 @@ public class PostThreadActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bar);
+        buttonListener = new PostButtonListener();
         b_prePage = (Button) findViewById(R.id.prePage_thread);
         b_reply = (Button) findViewById(R.id.refresh);
         b_reply.setText("回复");
+
         b_nextPage = (Button) findViewById(R.id.nextPage_thread);
+        b_prePage.setBackgroundColor(Color.parseColor("#4f6495ED"));
+        b_nextPage.setBackgroundColor(Color.parseColor("#4f6495ED"));
+        b_reply.setBackgroundColor(Color.parseColor("#4f649511"));
+        b_reply.setOnClickListener(buttonListener);
+        b_prePage.setOnClickListener(buttonListener);
+        b_nextPage.setOnClickListener(buttonListener);
         contextContainer = (ScrollView) findViewById(R.id.contentScroll);
         b_prePage.getBackground().setAlpha(40);
         b_nextPage.getBackground().setAlpha(40);
@@ -60,19 +72,71 @@ public class PostThreadActivity extends BaseActivity {
 
 
         List<PostThread> threads = bar.getPostThreads();
-        displayPosts(threads.get(index_selected_thread));
+        selected_thread = threads.get(index_selected_thread);
+        displayPosts(selected_thread);
 
     }
 
-    class PostListener implements View.OnClickListener {
+    class PostButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            //TODO
+            if (selected_thread != null) {
+                switch (v.getId()) {
+                    case R.id.prePage_thread:
+                        if (selected_thread.getCurrentPage() <= 1) {
+                            Toast.makeText(getApplicationContext(), "已经是第一页", Toast.LENGTH_SHORT).show();
+                        } else {
+                            LoadPostsTask loadPre = new LoadPostsTask();
+                            loadPre.execute(selected_thread.getCurrentPage() - 1);
+                        }
+                        break;
+                    case R.id.nextPage_thread:
+                        if (selected_thread.getCurrentPage() == selected_thread.getTotalPage()) {
+                            Toast.makeText(getApplicationContext(), "已经是最后一页", Toast.LENGTH_SHORT).show();
+                        } else {
+                            LoadPostsTask loadPre = new LoadPostsTask();
+                            loadPre.execute(selected_thread.getCurrentPage() + 1);
+                        }
+                        break;
+                    case R.id.refresh:
+                        break;
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "当前楼为空", Toast.LENGTH_SHORT);
+            }
         }
     }
 
 
-    class PostButtonListener implements View.OnClickListener {
+    private class LoadPostsTask extends AsyncTask<Integer, Integer, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... params) {
+
+            Integer pageNum = params[0];
+            if (selected_thread != null && baiduUtil.loadThreadPost(selected_thread, pageNum))
+                return 1;
+            else
+                return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+
+
+            if (null == result) {
+                Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
+                Log.e("html", baiduUtil.getReturnMassage());
+            } else {
+                contextContainer.removeAllViews();
+                displayPosts(selected_thread);
+                contextContainer.invalidate();
+            }
+        }
+    }
+
+
+    class PostListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             //TODO
@@ -96,9 +160,7 @@ public class PostThreadActivity extends BaseActivity {
 
             ll.addView(PView);
             PView.setOnClickListener(postListener);
-          /*  Button thread = new Button(this) ;
-            thread.setText(postThread.getTitle());
-            ll.addView(thread);*/
+
 
         }
         contextContainer.addView(ll);

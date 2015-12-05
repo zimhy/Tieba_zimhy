@@ -5,7 +5,6 @@ package com.example.zmh.tieba_zimhy.utils;
  */
 
 import android.content.Context;
-import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,7 +26,6 @@ import org.jsoup.Jsoup;
 //import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 /**
@@ -264,8 +262,8 @@ public class BaiduUtil {
         }
         String s_Page = getWebContent(fetchUrl);
         Document d_Page = Jsoup.parse(s_Page);
-
         try {
+
 
 
             Element skipPage = d_Page.select("div[class=h]").last();
@@ -302,7 +300,7 @@ public class BaiduUtil {
             List<Post> posts = selected_thread.getPosts();
             for (Element e_post : e_posts) {
                 Post post = new Post();
-                post.setUrl(barBaseUrl + "/" + e_post.getElementsByClass("reply_to").attr("href"));
+                post.setReplyListUrl(barBaseUrl + "/" + e_post.getElementsByClass("reply_to").attr("href"));
                 post.setReplyCount(e_post.getElementsByClass("reply_to").text());
 
 
@@ -315,10 +313,10 @@ public class BaiduUtil {
                 user.setName(e_user_name.getElementsByTag("a").first().text());
                 post.setUser(user);
                 Elements e_images = e_post.getElementsByTag("a") ;
-                for(Element e_image:e_images)
+              /*  for(Element e_image:e_images)
                 {
 
-                }
+                }*/
                 String s_post = e_post.html().replaceAll("(?i)<br[^>]*>", "br2n");
                 String text = Jsoup.parse(s_post).text();
                 text = text.replaceAll("br2n", "\n");
@@ -327,6 +325,7 @@ public class BaiduUtil {
               //  post.setContext(e_post.html().replaceAll(""));
                 posts.add(post);
             }
+            selected_thread.setCurrentPage(pageNum);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

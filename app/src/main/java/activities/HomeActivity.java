@@ -60,8 +60,8 @@ public class HomeActivity extends BaseActivity {
 
             selected_likeBar = baiduUtil.getLikeBars().get((int) v.getTag());
             selected_likeBarIndex = (Integer)v.getTag() ;
-            // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(likeBar.getUrl()));
-            //  startActivity(intent);
+
+
             new LoadTask().execute() ;
             Toast.makeText(getApplicationContext(), "加载中",
                     Toast.LENGTH_SHORT).show();

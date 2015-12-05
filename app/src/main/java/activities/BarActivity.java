@@ -1,6 +1,7 @@
 package activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +46,9 @@ public class BarActivity extends BaseActivity {
         b_prePage = (Button) findViewById(R.id.prePage_thread);
         b_refresh = (Button) findViewById(R.id.refresh);
         b_nextPage = (Button) findViewById(R.id.nextPage_thread);
+        b_prePage.setBackgroundColor(Color.parseColor("#4f6495ED"));
+        b_nextPage.setBackgroundColor(Color.parseColor("#4f6495ED"));
+        b_refresh.setBackgroundColor(Color.parseColor("#4f649511"));
         buttonListener = new PThreadButtonListener();
         b_prePage.setOnClickListener(buttonListener);
         b_nextPage.setOnClickListener(buttonListener);
