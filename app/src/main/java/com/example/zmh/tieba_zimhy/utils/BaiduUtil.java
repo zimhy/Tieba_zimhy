@@ -11,6 +11,7 @@ import android.widget.Toast;
 import entities.BaiduUser;
 import entities.LikeBar;
 import entities.Post;
+import entities.PostReply;
 import entities.PostThread;
 
 import java.util.ArrayList;
@@ -265,7 +266,6 @@ public class BaiduUtil {
         try {
 
 
-
             Element skipPage = d_Page.select("div[class=h]").last();
 
             Element totalPage = d_Page.select("[name=pnum]").first();
@@ -312,7 +312,7 @@ public class BaiduUtil {
 
                 user.setName(e_user_name.getElementsByTag("a").first().text());
                 post.setUser(user);
-                Elements e_images = e_post.getElementsByTag("a") ;
+                Elements e_images = e_post.getElementsByTag("a");
               /*  for(Element e_image:e_images)
                 {
 
@@ -321,8 +321,6 @@ public class BaiduUtil {
                 String text = Jsoup.parse(s_post).text();
                 text = text.replaceAll("br2n", "\n");
                 post.setContext(text.substring(0, text.lastIndexOf('\n')));
-
-              //  post.setContext(e_post.html().replaceAll(""));
                 posts.add(post);
             }
             selected_thread.setCurrentPage(pageNum);
@@ -335,7 +333,62 @@ public class BaiduUtil {
 
     }
 
-    public boolean loadPostReplies(Post post) {
-        return false;
+    public boolean loadPostReplies(Post post, Integer pageNum) {
+        if ("".equals(post.getReplyListUrl()) || null == post.getReplyListUrl()) {
+            return false;
+        }
+        String fetchUrl = post.getReplyListUrl();
+        if (pageNum > 1) {
+            fetchUrl += ("&fpn=" + pageNum);
+        }
+        String s_Page = getWebContent(fetchUrl);
+        Document d_Page = Jsoup.parse(s_Page);
+        Element skipPage = d_Page.select("div[class=h]").last();
+        if (skipPage != null) {
+            Element totalPage = d_Page.select("[name=pnum]").first();
+            if (totalPage != null) {
+                post.setTotalPage(Integer.parseInt(totalPage.attr("value")));
+            } else {
+                post.setTotalPage(1);
+            }
+        }
+        Elements d_replies = d_Page.getElementsByClass("i");
+        if (post.getReplies() == null) {
+            post.setReplies(new ArrayList<PostReply>());
+        }
+        List<PostReply> replies = post.getReplies();
+        replies.clear();
+        for (Element e_reply : d_replies) {
+            PostReply reply = new PostReply();
+
+
+            Element e_time = e_reply.select("span[class=b]").first();
+            reply.setTime(e_time.text());
+
+            Element e_user_name = e_reply.select("span[class=g]").first();
+            BaiduUser user = new BaiduUser();
+
+            Elements links = e_reply.getElementsByTag("a");
+            if (links.size() >= 2) {
+                user.setName(links.get(links.size() - 2).text());
+            }
+
+            reply.setUser(user);
+            // Elements e_images = e_post.getElementsByTag("a");
+              /*  for(Element e_image:e_images)
+                {
+
+                }*/
+            String s_post = e_reply.html().replaceAll("(?i)<br[^>]*>", "br2n");
+            String text = Jsoup.parse(s_post).text();
+            text = text.replaceAll("br2n", "\n");
+            reply.setContext(text.substring(0, text.lastIndexOf('\n')));
+            replies.add(reply);
+
+        }
+        post.setCurrentPage(pageNum);
+        return true;
     }
+
+
 }

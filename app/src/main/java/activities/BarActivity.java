@@ -1,5 +1,6 @@
 package activities;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -56,8 +57,11 @@ public class BarActivity extends BaseActivity {
         contextContainer = (ScrollView) findViewById(R.id.contentScroll);
         baiduUtil = BaiduUtil.getInstance();
         Intent intent = getIntent();
-        index_selected_bar = intent.getIntExtra(LIKE_BAR_INDEX, 0);
+
         bar = baiduUtil.getLikeBars().get(index_selected_bar);
+
+            setTitle(bar.getName());
+
         threadListener = new PThreadListener();
         displayThreads(bar);
 
@@ -166,7 +170,7 @@ public class BarActivity extends BaseActivity {
             } else {
 
                 Intent intent = new Intent();
-                intent.putExtra(LIKE_BAR_INDEX, index_selected_bar);
+                intent.putExtra(SELECTED_BAR_INDEX, index_selected_bar);
                 intent.putExtra(SELECTED_THREAD_INDEX, index_selected_thread);
                 intent.setAction("android.intent.action.PostThread");
                 intent.addCategory(Intent.CATEGORY_DEFAULT);

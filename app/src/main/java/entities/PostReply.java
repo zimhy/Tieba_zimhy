@@ -7,6 +7,7 @@ public class PostReply {
     BaiduUser user;
     String context;
     String time;
+    private String replyCount;
 
 
     public BaiduUser getUser() {
@@ -32,6 +33,14 @@ public class PostReply {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getReplyCount() {
+        return replyCount;
+    }
+
+    public void setReplyCount(String replyCount) {
+        this.replyCount = replyCount;
     }
 
 }

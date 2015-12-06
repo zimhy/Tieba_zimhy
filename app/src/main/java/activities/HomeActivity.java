@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class HomeActivity extends BaseActivity {
 
-    private BaiduUtil baiduUtil;
+
     private ScrollView scrollView;
     private LikeBar selected_likeBar = null;
     private int selected_likeBarIndex = 0 ;
@@ -105,7 +105,7 @@ public class HomeActivity extends BaseActivity {
 
         intent.setAction("android.intent.action.Bar") ;
         intent.addCategory(Intent.CATEGORY_DEFAULT) ;
-        intent.putExtra(LIKE_BAR_INDEX, selected_likeBarIndex) ;
+        intent.putExtra(SELECTED_BAR_INDEX, selected_likeBarIndex) ;
         startActivity(intent);
     }
 

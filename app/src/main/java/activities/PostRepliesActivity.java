@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -20,30 +22,36 @@ import java.util.List;
 
 import entities.LikeBar;
 import entities.Post;
+import entities.PostReply;
 import entities.PostThread;
 import views.PostView;
 
-/**
- * Created by zmh on 2015/12/3.
- */
-public class PostThreadActivity extends BaseActivity {
-
+public class PostRepliesActivity extends BaseActivity {
     private Button b_prePage;
     private Button b_reply;
     private Button b_nextPage;
     private ScrollView contextContainer;
     private LikeBar bar;
+    private ReplyButtonListener buttonListener;
 
-    private PostThread selected_thread;
-    private PostListener postListener;
-    private PostButtonListener buttonListener;
-    private Post selected_post;
+
+    private Post post;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bar);
-        buttonListener = new PostButtonListener();
+
+
+        baiduUtil = BaiduUtil.getInstance();
+        post = baiduUtil.getLikeBars().get(index_selected_bar).
+                getPostThreads().get(index_selected_thread).
+                getPosts().get(index_selected_post);
+
+            setTitle("回复： " + post.getContext());
+
+        buttonListener = new ReplyButtonListener();
         b_prePage = (Button) findViewById(R.id.prePage_thread);
         b_reply = (Button) findViewById(R.id.refresh);
         b_reply.setText("回复");
@@ -64,39 +72,59 @@ public class PostThreadActivity extends BaseActivity {
         index_selected_bar = intent.getIntExtra(SELECTED_BAR_INDEX, 0);
         index_selected_thread = intent.getIntExtra(SELECTED_THREAD_INDEX, 0);
         bar = baiduUtil.getLikeBars().get(index_selected_bar);
-        postListener = new PostListener();
+
         Resources res = getResources();
         Integer index_Bar = intent.getIntExtra(SELECTED_BAR_INDEX, 0);
 
 
         List<PostThread> threads = bar.getPostThreads();
-        selected_thread = threads.get(index_selected_thread);
 
-            setTitle(selected_thread.getTitle());
+        displayReplies(post);
 
-        displayPosts(selected_thread);
 
     }
 
-    class PostButtonListener implements View.OnClickListener {
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_poet_replies, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    class ReplyButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (selected_thread != null) {
+            if (post != null) {
                 switch (v.getId()) {
                     case R.id.prePage_thread:
-                        if (selected_thread.getCurrentPage() <= 1) {
+                        if (post.getCurrentPage() <= 1) {
                             Toast.makeText(getApplicationContext(), "已经是第一页", Toast.LENGTH_SHORT).show();
                         } else {
-                            LoadPostsTask loadPre = new LoadPostsTask();
-                            loadPre.execute(selected_thread.getCurrentPage() - 1);
+                            LoadReplissTask loadPre = new LoadReplissTask();
+                            loadPre.execute(post.getCurrentPage() - 1);
                         }
                         break;
                     case R.id.nextPage_thread:
-                        if (selected_thread.getCurrentPage() == selected_thread.getTotalPage()) {
+                        if (post.getCurrentPage() == post.getTotalPage()) {
                             Toast.makeText(getApplicationContext(), "已经是最后一页", Toast.LENGTH_SHORT).show();
                         } else {
-                            LoadPostsTask loadPre = new LoadPostsTask();
-                            loadPre.execute(selected_thread.getCurrentPage() + 1);
+                            LoadReplissTask loadPre = new LoadReplissTask();
+                            loadPre.execute(post.getCurrentPage() + 1);
                         }
                         break;
                     case R.id.refresh:
@@ -108,13 +136,12 @@ public class PostThreadActivity extends BaseActivity {
         }
     }
 
-
-    private class LoadPostsTask extends AsyncTask<Integer, Integer, Integer> {
+    private class LoadReplissTask extends AsyncTask<Integer, Integer, Integer> {
         @Override
         protected Integer doInBackground(Integer... params) {
 
             Integer pageNum = params[0];
-            if (selected_thread != null && baiduUtil.loadThreadPost(selected_thread, pageNum))
+            if (post != null && baiduUtil.loadPostReplies(post, pageNum))
                 return 1;
             else
                 return null;
@@ -130,74 +157,28 @@ public class PostThreadActivity extends BaseActivity {
                 Log.e("html", baiduUtil.getReturnMassage());
             } else {
                 contextContainer.removeAllViews();
-                displayPosts(selected_thread);
+                displayReplies(post);
                 contextContainer.invalidate();
             }
         }
     }
 
-
-    class PostListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            index_selected_post = (Integer) v.getTag();
-            selected_thread = bar.getPostThreads().get(index_selected_thread);
-            selected_post = selected_thread.getPosts().get(index_selected_post);
-
-
-            new LoadRepliesTask().execute(1);
-            Toast.makeText(getApplicationContext(), "加载中",
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private class LoadRepliesTask extends AsyncTask<Integer, Integer, Integer> {
-        @Override
-        protected Integer doInBackground(Integer... params) {
-            Integer pageNum = params[0];
-            if (selected_post != null && baiduUtil.loadPostReplies(selected_post, 1))
-                return 1;
-            else
-                return null;
-
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-
-
-            if (null == result) {
-                Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
-                Log.e("html", baiduUtil.getReturnMassage());
-            } else {
-                Intent intent = new Intent();
-                intent.setAction("android.intent.action.PostReplies");
-                intent.putExtra(SELECTED_POST_INDEX, index_selected_post);
-                intent.putExtra(SELECTED_THREAD_INDEX, index_selected_thread);
-                intent.putExtra(SELECTED_BAR_INDEX, index_selected_bar);
-                startActivity(intent);
-
-            }
-        }
-    }
-
-    private void displayPosts(PostThread postThread) {
-        //Resources res = getResources();
-
+    private void displayReplies(Post post) {
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
-        List<Post> posts = postThread.getPosts();
-        for (int i = 0; i < posts.size(); i++) {
-            Post post = posts.get(i);
-            PostView PView = new PostView(getApplicationContext(), post);
+        List<PostReply> replies = post.getReplies();
+        for (int i = 0; i < replies.size(); i++) {
+            PostReply reply = replies.get(i);
+            PostView PView = new PostView(getApplicationContext(), reply);
             LinearLayout.LayoutParams linearParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT / 2, 40);
             linearParam.width = LinearLayout.LayoutParams.MATCH_PARENT;
             linearParam.height = LinearLayout.LayoutParams.WRAP_CONTENT;
             PView.setLayoutParams(linearParam);
             PView.setTag(i);
             ll.addView(PView);
-            PView.setOnClickListener(postListener);
+            //PView.setOnClickListener(postListener);
         }
         contextContainer.addView(ll);
     }
+
 }

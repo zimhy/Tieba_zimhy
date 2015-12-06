@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.zmh.tieba_zimhy.utils.TextSizeUtil;
 
 import entities.Post;
+import entities.PostReply;
 import entities.PostThread;
 
 /**
@@ -25,7 +26,7 @@ import entities.PostThread;
  */
 public class PostView extends BaseView {
 
-    private Post post;
+    private PostReply post;
 
     /*    public PostView(Context context, AttributeSet attrs, Post post) {
             super(context, attrs);
@@ -34,7 +35,7 @@ public class PostView extends BaseView {
             // this.setAlpha(40);
 
         }*/
-    public PostView(Context context, Post post) {
+    public PostView(Context context, PostReply post) {
         super(context);
         this.post = post;
         TextView blank = new TextView(context);

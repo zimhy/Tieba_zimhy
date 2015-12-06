@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1"
-    android:background="#4f6495ED"
+    android:background="#5fE0EEEE"
     >
 
 
@@ -13,19 +13,7 @@
         android:id="@+id/scrollView_home"
         android:layout_gravity="center_horizontal" >
 
-     <!--   <LinearLayout
-         android:orientation="horizontal"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_horizontal"
-         android:id="@+id/home_base">
-        <Button
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:text="LikeBar"
-             android:id="@+id/LikeBar_Button"
-             android:layout_gravity="center_horizontal" />
-     </LinearLayout>-->
+
 
 
     </ScrollView>
