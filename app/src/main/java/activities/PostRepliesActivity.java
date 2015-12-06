@@ -120,7 +120,7 @@ public class PostRepliesActivity extends BaseActivity {
                         }
                         break;
                     case R.id.nextPage_thread:
-                        if (post.getCurrentPage() == post.getTotalPage()) {
+                        if (post.getCurrentPage() >= post.getTotalPage()) {
                             Toast.makeText(getApplicationContext(), "已经是最后一页", Toast.LENGTH_SHORT).show();
                         } else {
                             LoadReplissTask loadPre = new LoadReplissTask();
