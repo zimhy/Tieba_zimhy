@@ -5,7 +5,7 @@ package entities;
  */
 public class PostReply {
     BaiduUser user;
-    String context;
+    CharSequence context;
     String time;
     private String replyCount;
 
@@ -18,11 +18,11 @@ public class PostReply {
         this.user = user;
     }
 
-    public String getContext() {
+    public CharSequence getContext() {
         return context;
     }
 
-    public void setContext(String context) {
+    public void setContext(CharSequence context) {
         this.context = context;
     }
 

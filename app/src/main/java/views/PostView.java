@@ -68,11 +68,13 @@ public class PostView extends BaseView {
         TextView userName_time = new TextView(context);
         userName_time.setTextColor(Color.BLACK);
         userName_time.setText(post.getUser().getName() + "   " + post.getTime());
+        userName_time.setTextSize(TypedValue.COMPLEX_UNIT_PX,sizeUtil.getMidTextSize());
         userName_time_reply.addView(userName_time, params_left);
         RelativeLayout.LayoutParams params_right = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT) ;
         params_right.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         TextView reply = new TextView(context);
         reply.setText(post.getReplyCount());
+        reply.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeUtil.getMidTextSize());
 
         userName_time_reply.addView(reply,params_right);
         addView(userName_time_reply);

@@ -142,7 +142,7 @@ public class BarActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(),
                         "当前第" + bar.getCurrentPage() + "页", Toast.LENGTH_SHORT).show();
                 contextContainer.invalidate();
-
+                contextContainer.fullScroll(ScrollView.FOCUS_UP) ;
             }
         }
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +39,9 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TextSizeUtil textSizeUtil  = TextSizeUtil.getInstance() ;
-        textSizeUtil.calSize(getWindowManager().getDefaultDisplay().getWidth());
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metric);
+        textSizeUtil.calSize(metric.densityDpi,metric.widthPixels);
         setContentView(R.layout.activity_login);
         mPlusSignInButton = (Button) findViewById(R.id.plus_sign_in_button);
 

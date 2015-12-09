@@ -58,7 +58,7 @@ public class PostThreadView extends BaseView {
 
         TextView messages = new TextView(context);
         messages.setText(pThread.getViewMessage());
-        messages.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeUtil.getSmallTextSize() + 3);
+        messages.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeUtil.getSmallTextSize());
         messages.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
         messages.setGravity(Gravity.RIGHT);
         // LayoutParams params_message  = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT) ;

@@ -89,6 +89,7 @@ public class PostThreadActivity extends BaseActivity {
                         } else {
                             LoadPostsTask loadPre = new LoadPostsTask();
                             loadPre.execute(selected_thread.getCurrentPage() - 1);
+                            Toast.makeText(getApplicationContext(), "加载中", Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case R.id.nextPage_thread:
@@ -97,13 +98,14 @@ public class PostThreadActivity extends BaseActivity {
                         } else {
                             LoadPostsTask loadPre = new LoadPostsTask();
                             loadPre.execute(selected_thread.getCurrentPage() + 1);
+                            Toast.makeText(getApplicationContext(), "加载中", Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case R.id.refresh:
                         break;
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "当前楼为空", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "当前楼为空", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -132,6 +134,7 @@ public class PostThreadActivity extends BaseActivity {
                 contextContainer.removeAllViews();
                 displayPosts(selected_thread);
                 contextContainer.invalidate();
+                contextContainer.fullScroll(ScrollView.FOCUS_UP) ;
             }
         }
     }

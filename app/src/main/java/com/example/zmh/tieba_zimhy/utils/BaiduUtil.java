@@ -4,7 +4,10 @@ package com.example.zmh.tieba_zimhy.utils;
  * Created by zmh on 2015/11/29.
  */
 
+
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,6 +17,7 @@ import entities.Post;
 import entities.PostReply;
 import entities.PostThread;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +52,8 @@ public class BaiduUtil {
     private String barBaseUrl = null;
     private String returnMassage;
     private HttpUtil httpUtil;
+    private Html.ImageGetter imgGetter;
+    private TextSizeUtil sizeUtil;
 
 
     private List<LikeBar> likeBars;
@@ -59,6 +65,24 @@ public class BaiduUtil {
     private BaiduUtil() {
         likeBars = new ArrayList<LikeBar>();
         httpUtil = new HttpUtil();
+        sizeUtil = TextSizeUtil.getInstance();
+
+
+        imgGetter = new Html.ImageGetter() {
+            public Drawable getDrawable(String source) {
+                Drawable drawable = null;
+                URL url;
+                try {
+                    url = new URL(source);
+                    drawable = Drawable.createFromStream(url.openStream(), "");  //获取网路图片
+                } catch (Exception e) {
+                    return null;
+                }
+                drawable.setBounds(sizeUtil.getImageSize(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+                return drawable;
+            }
+        };
+
 
         //this.context = context;
     }
@@ -300,27 +324,30 @@ public class BaiduUtil {
             List<Post> posts = selected_thread.getPosts();
             for (Element e_post : e_posts) {
                 Post post = new Post();
-                post.setReplyListUrl(barBaseUrl + "/" + e_post.getElementsByClass("reply_to").attr("href"));
-                post.setReplyCount(e_post.getElementsByClass("reply_to").text());
+                Element e_reply_count = e_post.getElementsByClass("reply_to").first();
+                post.setReplyListUrl(barBaseUrl + "/" + e_reply_count.attr("href"));
+                post.setReplyCount(e_reply_count.text());
+                e_reply_count.remove();
 
 
                 Element e_time = e_post.select("span[class=b]").first();
                 post.setTime(e_time.text());
+                e_time.remove();
 
                 Element e_user_name = e_post.select("span[class=g]").first();
+                e_user_name.remove();
                 BaiduUser user = new BaiduUser();
-
                 user.setName(e_user_name.getElementsByTag("a").first().text());
                 post.setUser(user);
-                Elements e_images = e_post.getElementsByTag("a");
-              /*  for(Element e_image:e_images)
-                {
-
-                }*/
-                String s_post = e_post.html().replaceAll("(?i)<br[^>]*>", "br2n");
-                String text = Jsoup.parse(s_post).text();
-                text = text.replaceAll("br2n", "\n");
-                post.setContext(text.substring(0, text.lastIndexOf('\n')));
+                Elements e_images = e_post.select("a[href~=(?i)\\.(png|jpe?g)]");
+                for (Element e_image : e_images) {
+                    e_image.after("<img src=" + e_image.attr("href") + "/>");
+                }
+                //String s_post = e_post.html().replaceAll("(?i)<br[^>]*>", "br2n");
+                //String text = Jsoup.parse(s_post).text();
+                //text = text.replaceAll("br2n", "\n");
+                setHtmlFont(e_post, (int) sizeUtil.getBigTextSize(), null);
+                post.setContext(Html.fromHtml(e_post.html(), imgGetter, null));
                 posts.add(post);
             }
             selected_thread.setCurrentPage(pageNum);
@@ -374,11 +401,7 @@ public class BaiduUtil {
             }
 
             reply.setUser(user);
-            // Elements e_images = e_post.getElementsByTag("a");
-              /*  for(Element e_image:e_images)
-                {
 
-                }*/
             String s_post = e_reply.html().replaceAll("(?i)<br[^>]*>", "br2n");
             String text = Jsoup.parse(s_post).text();
             text = text.replaceAll("br2n", "\n");
@@ -390,5 +413,8 @@ public class BaiduUtil {
         return true;
     }
 
-
+    private void setHtmlFont(Element e, int textSize, String textColor) {
+        e.before("<font" + textColor == null ? "" : " color=\\\"" + textColor + "\\\"  size =" + textSize + " >");
+        e.after("/font");
+    }
 }
