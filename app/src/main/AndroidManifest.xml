@@ -30,6 +30,7 @@
         </activity>
         <activity
             android:name="activities.HomeActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.Home" />
@@ -39,6 +40,7 @@
         </activity>
         <activity
             android:name="activities.BarActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.Bar" />
@@ -48,6 +50,7 @@
         </activity>
         <activity
             android:name="activities.PostThreadActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.PostThread" />
@@ -63,6 +66,7 @@
         -->
         <activity
             android:name="activities.PostRepliesActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_poet_replies"
             android:parentActivityName="activities.BaseActivity" >
             <intent-filter>

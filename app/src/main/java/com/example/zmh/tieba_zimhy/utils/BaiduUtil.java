@@ -17,6 +17,8 @@ import entities.Post;
 import entities.PostReply;
 import entities.PostThread;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -416,5 +419,30 @@ public class BaiduUtil {
     private void setHtmlFont(Element e, int textSize, String textColor) {
         e.before("<font" + textColor == null ? "" : " color=\\\"" + textColor + "\\\"  size =" + textSize + " >");
         e.after("/font");
+    }
+
+    public boolean postReply(String url, String pid, String tbs, String ti, String z, String fid, String co) {
+        //TODO
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("sub1", "回帖"));
+        params.add(new BasicNameValuePair("src", "3"));
+        params.add(new BasicNameValuePair("tn", "baiduWiseSubmit"));
+        params.add(new BasicNameValuePair("ifpost", "1"));
+        params.add(new BasicNameValuePair("fpn", "1"));
+        params.add(new BasicNameValuePair("ifposta", "0"));
+        HttpEntity he = null ;
+        try {
+            he = new UrlEncodedFormEntity(params, "UTF-8");
+            HttpResponse hr = httpUtil.post(url, he);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return true;
     }
 }
