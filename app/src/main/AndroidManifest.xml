@@ -39,6 +39,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="activities.WriteReplyActivity"
+            android:launchMode="singleTop"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.Reply" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="activities.BarActivity"
             android:launchMode="singleTop"
             android:label="@string/app_name" >

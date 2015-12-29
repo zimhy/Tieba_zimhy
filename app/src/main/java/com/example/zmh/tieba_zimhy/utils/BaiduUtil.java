@@ -354,6 +354,11 @@ public class BaiduUtil {
                 posts.add(post);
             }
             selected_thread.setCurrentPage(pageNum);
+
+            selected_thread.setFid(d_Page.select("[name=fid]").first().attr("value"));
+            selected_thread.setTbs(d_Page.select("[name=tbs]").first().attr("value"));
+            selected_thread.setTi(d_Page.select("[name=ti]").first().attr("value"));
+            selected_thread.setZ(d_Page.select("[name=z]").first().attr("value"));
             return true;
         } catch (Exception e) {
             e.printStackTrace();

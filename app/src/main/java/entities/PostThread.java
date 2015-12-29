@@ -15,12 +15,51 @@ public class PostThread {
     private Integer currentPage = 0;
     private String nextPageUrl;
     private String prePageUrl;
+    private String tbs  ;
+    private String ti ;
+    private String z ;
+    private String fid ;
+
 
     List<Post> Posts;
 
 
     public boolean validCheck() {
         return url != null && title != null && !ERROR_VIEW_MESSAGE.equals(viewMessage);
+    }
+
+
+
+    public String getFid() {
+        return fid;
+    }
+
+    public void setFid(String fid) {
+        this.fid = fid;
+    }
+
+    public String getTbs() {
+        return tbs;
+    }
+
+    public void setTbs(String tbs) {
+        this.tbs = tbs;
+    }
+
+    public String getTi() {
+        return ti;
+    }
+
+    public void setTi(String ti) {
+        this.ti = ti;
+    }
+
+    public String getZ() {
+        return z;
+    }
+
+    public void setZ(String z) {
+        this.z = z;
     }
 
     public String getTitle() {

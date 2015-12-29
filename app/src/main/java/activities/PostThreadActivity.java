@@ -102,6 +102,12 @@ public class PostThreadActivity extends BaseActivity {
                         }
                         break;
                     case R.id.refresh:
+                        Intent intent  = new Intent() ;
+                        intent.setAction("android.intent.action.Reply");
+
+                        intent.putExtra(SELECTED_THREAD_INDEX, index_selected_thread);
+                        intent.putExtra(SELECTED_BAR_INDEX, index_selected_bar);
+                        startActivity(intent);
                         break;
                 }
             } else {
@@ -173,11 +179,12 @@ public class PostThreadActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(), "加载失败", Toast.LENGTH_SHORT);
                 Log.e("html", baiduUtil.getReturnMassage());
             } else {
-                Intent intent = new Intent();
+                Intent intent = new Intent () ;
                 intent.setAction("android.intent.action.PostReplies");
                 intent.putExtra(SELECTED_POST_INDEX, index_selected_post);
                 intent.putExtra(SELECTED_THREAD_INDEX, index_selected_thread);
                 intent.putExtra(SELECTED_BAR_INDEX, index_selected_bar);
+                
                 startActivity(intent);
 
             }

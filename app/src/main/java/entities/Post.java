@@ -10,8 +10,12 @@ public class Post extends PostReply {
     private String replyListUrl;
     private Integer pageCapacity;
     private Integer totalPage = 1;
+
+    //public boolean postReply(String url, String pid, String tbs, String ti, String z, String fid, String co)
+
     private List<PostReply> replies;
     private int currentPage;
+
 
     public List<PostReply> getReplies() {
         return replies;
